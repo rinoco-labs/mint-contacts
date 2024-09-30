@@ -9,8 +9,9 @@ module rinoco::orchestrator {
         kiosk::{Self},
         package::{Self},
         sui::{SUI},
-        table_vec::{Self, TableVec},
+        // table_vec::{Self, TableVec},
         transfer_policy::{TransferPolicy},
+        event
     };
     use rinoco::{
         // attributes::{Self},
@@ -68,7 +69,13 @@ module rinoco::orchestrator {
         phase: u8,
     }
 
-    // === Events ===
+    // ====== Events ======
+
+    public struct NFTMinted has copy, drop {
+        nft_id: ID,
+        kiosk_id: ID,
+        minter: address,
+    }
 
     // Orch Admin cap this can be used to make changes to the orch setting and warehouse
     public struct OrchAdminCap has key { id: UID, `for_settings`: ID, `for_warehouse`: ID}
@@ -114,7 +121,7 @@ module rinoco::orchestrator {
 
 
     public entry fun public_mint(
-        waterCooler: &WaterCooler,
+        waterCooler: &mut WaterCooler,
         factorySettings: &FactorySetings,
         warehouse: &mut Warehouse,
         settings: &Settings,
@@ -136,7 +143,7 @@ module rinoco::orchestrator {
     public fun whitelist_mint(
         ticket: WhitelistTicket,
         factorySettings: &FactorySetings,
-        waterCooler: &WaterCooler,
+        waterCooler: &mut WaterCooler,
         warehouse: &mut Warehouse,
         settings: &Settings,
         policy: &TransferPolicy<Rinoco>,
@@ -162,7 +169,7 @@ module rinoco::orchestrator {
     public fun og_mint(
         ticket: OriginalGangsterTicket,
         factorySettings: &FactorySetings,
-        waterCooler: &WaterCooler,
+        waterCooler: &mut WaterCooler,
         warehouse: &mut Warehouse,
         settings: &Settings,
         policy: &TransferPolicy<Rinoco>,
@@ -259,6 +266,26 @@ module rinoco::orchestrator {
         transfer::transfer(og_ticket, owner);
     }
 
+    public fun create_og_ticket_bulk(
+        _: &OrchAdminCap,
+        waterCooler: &WaterCooler,
+        mut addresses: vector<address>,
+        ctx: &mut TxContext
+    ) {
+        while(addresses.length() > 0) {
+            let og_ticket =  OriginalGangsterTicket {
+                id: object::new(ctx),
+                name: water_cooler::name(waterCooler),
+                waterCoolerId: object::id(waterCooler),
+                image_url: water_cooler::placeholder_image(waterCooler),
+                phase: 1
+            };
+
+            transfer::transfer(og_ticket, addresses.pop_back());
+        }
+
+    }
+
     public fun create_wl_ticket(
         _: &OrchAdminCap,
         waterCooler: &WaterCooler,
@@ -274,6 +301,24 @@ module rinoco::orchestrator {
         };
 
         transfer::transfer(whitelist_ticket, owner);
+    }
+    
+    public fun create_wl_ticket_bulk(
+        _: &OrchAdminCap,
+        waterCooler: &WaterCooler,
+        mut addresses: vector<address>,
+        ctx: &mut TxContext
+    ) {
+        while(addresses.length() > 0) {
+            let whitelist_ticket =  WhitelistTicket {
+                id: object::new(ctx),
+                name: water_cooler::name(waterCooler),
+                waterCoolerId: object::id(waterCooler),
+                image_url: water_cooler::placeholder_image(waterCooler),
+                phase: 2
+            };
+            transfer::transfer(whitelist_ticket, addresses.pop_back());
+        }
     }
 
     // === Package functions ===
@@ -301,7 +346,7 @@ module rinoco::orchestrator {
     #[allow(lint(self_transfer, share_owned))]
     public fun mint_capsule(
         factorySettings: &FactorySetings,
-        waterCooler: &WaterCooler,
+        waterCooler: &mut WaterCooler,
         warehouse: &mut Warehouse,
         _policy: &TransferPolicy<Rinoco>,
         mut payment: Coin<SUI>,
@@ -312,6 +357,13 @@ module rinoco::orchestrator {
 
         // Create a new kiosk and its owner capability
         let (mut kiosk, kiosk_owner_cap) = kiosk::new(ctx);
+
+
+        event::emit(NFTMinted { 
+            nft_id: object::id(&nft),
+            kiosk_id: object::id(&kiosk),
+            minter: ctx.sender(),
+        });
 
         // Place the NFT in the kiosk
         kiosk::place(&mut kiosk, &kiosk_owner_cap, nft);
@@ -333,6 +385,10 @@ module rinoco::orchestrator {
 
         // Send the payment to the water cooler
         waterCooler.send_fees(payment);
+        waterCooler.inc_minted();
+
+        
+        
     }
 
 

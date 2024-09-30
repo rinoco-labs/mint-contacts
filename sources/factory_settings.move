@@ -36,7 +36,7 @@ module rinoco::factory_settings {
         transfer::share_object(
             FactorySetings {
                 id: object::new(ctx),
-                mint_fee: 100_000,
+                mint_fee: 0,
                 treasury: @rinoco_treasury,
             }
         );

@@ -40,7 +40,7 @@ module rinoco::cooler_factory {
         transfer::share_object(
             CoolerFactory {
                 id: object::new(ctx),
-                fee: 100_000_000,
+                fee: 0,
                 treasury: @rinoco_treasury,
                 cooler_list: vector::empty()
             }

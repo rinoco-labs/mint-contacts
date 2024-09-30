@@ -68,7 +68,10 @@ module rinoco::water_cooler {
         owner: address,
         // This bool determins wether or not a to display the Water cooler on the launchpad
         display: bool,
-        init_counter: u64
+        // Initialize water cooler if the number of NFT created is equal to the size of the collection.
+        init_counter: u64,
+        // This keeps track of the number of NFTs that have been minted
+        minted_counter: u64
     }
 
     // Admin cap of this Water Cooler to be used but the Cooler owner when making changes
@@ -141,7 +144,8 @@ module rinoco::water_cooler {
             balance: balance::zero(),
             owner: ctx.sender(),
             display: false,
-            init_counter: 0
+            init_counter: 0,
+            minted_counter: 0
         };
 
         transfer::transfer(
@@ -170,6 +174,10 @@ module rinoco::water_cooler {
         coins: Coin<SUI>
     ) {
         transfer::public_transfer(coins, self.treasury);
+    }
+
+    public(package) fun inc_minted(self: &mut WaterCooler) {
+        self.minted_counter = self.minted_counter + 1;
     }
     
     public(package) fun get_is_revealed(

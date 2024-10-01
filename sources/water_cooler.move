@@ -7,7 +7,7 @@ module rinoco::water_cooler {
         coin::{Self, Coin},
         display,
         table_vec::{Self, TableVec},
-        transfer_policy
+        transfer_policy,
     };
     use rinoco::{
         rinoco::{Self, Rinoco},
@@ -89,9 +89,6 @@ module rinoco::water_cooler {
         display::add(&mut display, string::utf8(b"description"), string::utf8(b"{description}"));
         display::add(&mut display, string::utf8(b"image_url"), string::utf8(b"{image_url}"));
         display::add(&mut display, string::utf8(b"attributes"), string::utf8(b"{attributes}"));
-        display::add(&mut display, string::utf8(b"minted_by"), string::utf8(b"{minted_by}"));
-        display::add(&mut display, string::utf8(b"kiosk_id"), string::utf8(b"{kiosk_id}"));
-        display::add(&mut display, string::utf8(b"kiosk_owner_cap_id"), string::utf8(b"{kiosk_owner_cap_id}"));
         display::update_version(&mut display);
 
         let (policy, policy_cap) = transfer_policy::new<Rinoco>(&publisher, ctx);

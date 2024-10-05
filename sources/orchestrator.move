@@ -21,7 +21,6 @@ module rinoco::orchestrator {
         warehouse::{Self, Warehouse},
         settings::{Self, Settings},
         // image::{Image},
-        // registry::{Registry}
     };
 
     // === Errors ===
@@ -344,7 +343,7 @@ module rinoco::orchestrator {
     // === Private Functions ===
 
     #[allow(lint(self_transfer, share_owned))]
-    public fun mint_capsule(
+    fun mint_capsule(
         factorySettings: &FactorySetings,
         waterCooler: &mut WaterCooler,
         warehouse: &mut Warehouse,
@@ -353,7 +352,7 @@ module rinoco::orchestrator {
         ctx: &mut TxContext,
     ) {
         // Safely unwrap the NFT from the warehouse
-        let nft = warehouse.pop_nft();
+        let nft = warehouse.pop_nft(ctx);
 
         // Create a new kiosk and its owner capability
         let (mut kiosk, kiosk_owner_cap) = kiosk::new(ctx);

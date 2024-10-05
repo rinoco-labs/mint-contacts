@@ -1,8 +1,8 @@
+import dotenv from 'dotenv';
 import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import type { SuiObjectChange } from "@mysten/sui/client";
 import { fromB64 } from "@mysten/sui/utils";
-import dotenv from 'dotenv';
 import chalk from 'chalk';
 
 export interface IObjectInfo {

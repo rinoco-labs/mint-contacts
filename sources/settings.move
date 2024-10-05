@@ -16,7 +16,6 @@ module rinoco::settings {
         water_cooler::{Self, WaterCooler},
         rinoco::{Rinoco},
         // image::{Image},
-        // registry::{Registry}
     };
 
     // === Errors ===

@@ -4,3 +4,4 @@ build
 publish.json
 Move.lock
 .env
+scripts

@@ -8,6 +8,7 @@ module rinoco::water_cooler {
         display,
         table_vec::{Self, TableVec},
         transfer_policy,
+        event
     };
     use rinoco::{
         rinoco::{Self, Rinoco},
@@ -23,10 +24,17 @@ module rinoco::water_cooler {
     const EWaterCoolerAlreadyInitialized: u64 = 0;
     const ENFTNotFromCollection: u64 = 1;
     const ENFTAlreadyRevealed: u64 = 2;
-    const ERegistryDoesNotMatchCooler: u64 = 3;
+    // const ERegistryDoesNotMatchCooler: u64 = 3;
     const ECollectionDoesNotMatchCooler: u64 = 4;
     // const EWaterCoolerNotInitialized: u64 = 3;
     // const EWaterCoolerNotEmpty: u64 = 4;
+
+    // Events
+
+    public struct NFTCreated has copy, drop {
+        nft_id: ID,
+        minter: address,
+    }
 
     // === Structs ===
 
@@ -49,7 +57,7 @@ module rinoco::water_cooler {
         // Meaning their metadata has been added
         revealed_nfts: vector<ID>,
         // This is the ID of the registry that keeps track of the NFTs in the collection
-        registry_id: ID,
+        // registry_id: ID,
         supply: u64,
         // This is the ID that is associalted with this NFT collection. 
         // It was created for the purpose of avoiding a cercular dependency 
@@ -116,7 +124,7 @@ module rinoco::water_cooler {
     ): ID {
 
         let collection = collection::new(supply as u16, ctx);
-        let registry = registry::create_registry(name, description, image_url, ctx);
+        // let registry = registry::create_registry(name, description, image_url, ctx);
         // let settings = settings::new(ctx);
         // let warehouse = warehouse::new(ctx);
 
@@ -130,10 +138,8 @@ module rinoco::water_cooler {
             nfts: table_vec::empty(ctx),
             revealed_nfts: vector::empty(),
             treasury,
-            registry_id: object::id(&registry),
+            // registry_id: object::id(&registry),
             collection_id: object::id(&collection),
-            // settings_id: object::id(&settings),
-            // warehouse_id: object::id(&warehouse),
             settings_id,
             warehouse_id,
             is_initialized: false,
@@ -158,7 +164,7 @@ module rinoco::water_cooler {
         transfer::share_object(waterCooler);
 
         collection::transfer_collection(collection, ctx);
-        registry::transfer_registry(registry, ctx);
+        // registry::transfer_registry(registry, ctx);
         // settings::transfer_setting(settings, ctx);
         // warehouse::transfer_warehouse(warehouse, ctx);
         
@@ -201,12 +207,12 @@ module rinoco::water_cooler {
         self.settings_id
     }
     
-    public(package) fun check_registry(
-        self: &WaterCooler,
-        registry: &Registry,
-    ): bool {
-        self.registry_id == object::id(registry)
-    }
+    // public(package) fun check_registry(
+    //     self: &WaterCooler,
+    //     registry: &Registry,
+    // ): bool {
+    //     self.registry_id == object::id(registry)
+    // }
     
     public(package) fun check_collection(
         self: &WaterCooler,
@@ -229,7 +235,7 @@ module rinoco::water_cooler {
     public entry fun initialize_with_data(
         _: &WaterCoolerAdminCap,
         self: &mut WaterCooler,
-        registry: &mut Registry,
+        // registry: &mut Registry,
         collection: &Collection,
         mut numbers: vector<u64>,
         mut image_urls: vector<String>,
@@ -260,6 +266,11 @@ module rinoco::water_cooler {
                 ctx,
             );
 
+            event::emit(NFTCreated { 
+                nft_id: object::id(&nft),
+                minter: ctx.sender(),
+            });
+
             // registry::add_new(number as u16, object::id(&nft), registry, collection);
 
             // Add Rinoco to factory.
@@ -281,7 +292,7 @@ module rinoco::water_cooler {
     public entry fun initialize_water_cooler(
         _: &WaterCoolerAdminCap,
         self: &mut WaterCooler,
-        registry: &mut Registry,
+        // registry: &mut Registry,
         collection: &Collection,
         ctx: &mut TxContext,
     ) {
@@ -322,7 +333,7 @@ module rinoco::water_cooler {
     public fun reveal_nft(
         _: &WaterCoolerAdminCap,
         self: &mut WaterCooler,
-        registry: &Registry,
+        // registry: &Registry,
         collection: &Collection,
         nft: &mut Rinoco,
         keys: vector<String>,
@@ -331,7 +342,7 @@ module rinoco::water_cooler {
         image_url: String,
         ctx: &mut TxContext
     ) {
-        assert!(self.registry_id == object::id(registry), ERegistryDoesNotMatchCooler);
+        // assert!(self.registry_id == object::id(registry), ERegistryDoesNotMatchCooler);
         assert!(self.collection_id == object::id(collection), ECollectionDoesNotMatchCooler);
         let nft_id = object::id(nft);
         // assert!(registry.is_nft_registered(nft_id), ENFTNotFromCollection);

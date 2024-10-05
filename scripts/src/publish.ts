@@ -47,7 +47,7 @@ if (!objectChanges) {
     process.exit(1)
 }
 
-console.log(objectChanges)
+
 console.log(`Spent ${Math.abs(parse_amount(balanceChanges[0].amount))} on deploy`);
 
 const published_change = objectChanges.find(change => change.type == "published");

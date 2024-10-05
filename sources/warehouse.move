@@ -13,7 +13,7 @@ module rinoco::warehouse {
         // attributes::{Self},
         rinoco::{Rinoco},
         // image::{Image},
-        // registry::{Registry}
+        pseuso_random
     };
 
     // === Errors ===
@@ -90,11 +90,42 @@ module rinoco::warehouse {
         self.nfts.is_empty()
     }
     
-    public(package) fun pop_nft(
-        self: &mut Warehouse,
-    ): Rinoco {
-        self.nfts.pop_back()
+    // public(package) fun pop_nft(
+    //     self: &mut Warehouse,
+    // ): Rinoco {
+    //     self.nfts.pop_back()
+    // }
+
+
+
+
+
+    public(package) fun pop_nft(self: &mut Warehouse,  ctx: &mut TxContext): Rinoco {
+        let v0 = if (self.count() == 1) {
+                0
+            } else {
+                pseuso_random::rng(0, self.count() - 1, ctx)
+            };
+
+        
+         let rinoco = if (self.nfts.length() == 1) {
+            self.nfts.pop_back()
+        } else {
+            self.nfts.swap_remove(v0)
+        };
+        rinoco
     }
+
+
+
+
+
+
+
+
+
+
+
 
     #[allow(lint(share_owned))]
     public(package) fun transfer_warehouse(self: Warehouse, ctx: &mut TxContext) {

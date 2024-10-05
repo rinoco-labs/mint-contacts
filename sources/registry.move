@@ -42,18 +42,18 @@ module rinoco::registry {
     #[allow(unused_variable, lint(share_owned))]
     fun init(
         otw: REGISTRY,
-        ctx: &mut TxContext,
+        _ctx: &mut TxContext,
     ) {
-        let publisher = package::claim(otw, ctx);
+        // let publisher = package::claim(otw, ctx);
 
-        let mut registry_display = display::new<Registry>(&publisher, ctx);
-        registry_display.add(b"name".to_string(), b"NFT Registry".to_string());
-        registry_display.add(b"description".to_string(), b"The registry for your NFT collection.".to_string());
-        registry_display.add(b"image_url".to_string(), b"{image_url}".to_string());
-        registry_display.add(b"is_ready".to_string(), b"{is_ready}".to_string());
+        // let mut registry_display = display::new<Registry>(&publisher, ctx);
+        // registry_display.add(b"name".to_string(), b"NFT Registry".to_string());
+        // registry_display.add(b"description".to_string(), b"The registry for your NFT collection.".to_string());
+        // registry_display.add(b"image_url".to_string(), b"{image_url}".to_string());
+        // registry_display.add(b"is_ready".to_string(), b"{is_ready}".to_string());
 
-        transfer::public_transfer(registry_display, ctx.sender());
-        transfer::public_transfer(publisher, ctx.sender());
+        // transfer::public_transfer(registry_display, ctx.sender());
+        // transfer::public_transfer(publisher, ctx.sender());
     }
 
     // === Package Functions ===
